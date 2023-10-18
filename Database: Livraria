@@ -1,0 +1,58 @@
+USE master
+DROP DATABASE livraria
+CREATE DATABASE livraria
+USE livraria
+GO
+CREATE TABLE livro (
+codigo			int				NOT NULL IDENTITY(100001, 100),
+nome			varchar(200)	NOT NULL,
+lingua			varchar(10)		NOT NULL DEFAULT('PT-BR'),
+ano				int				NOT NULL CHECK(ano < 1990)
+PRIMARY KEY (codigo)
+)
+GO
+CREATE TABLE autor (
+id_autor		int				NOT NULL IDENTITY(2351, 1),
+nome			varchar(100)	NOT NULL UNIQUE,
+data_nasc		date			NOT NULL,
+pais_nasc		varchar(50)		NOT NULL,
+biografia		varchar(255)	NOT NULL,
+CONSTRAINT chk_pais_nasc CHECK((UPPER(pais_nasc) = 'brasil' OR UPPER(pais_nasc) = 'estados unidos' OR UPPER(pais_nasc) = 'inglaterra' OR UPPER(pais_nasc) = 'alemanha' )),
+PRIMARY KEY (id_autor)
+)
+GO
+CREATE TABLE editora (
+id_editora		int				NOT NULL IDENTITY(491, 16),
+nome			varchar(70)		NOT NULL UNIQUE,
+telefone		varchar(11)		NOT NULL CHECK(telefone = 10),
+logradouro_end	varchar(200)	NOT NULL,
+numero_end		int				NOT NULL CHECK(numero_end < 0),
+cep_end			char(8)			NOT NULL CHECK(cep_end = 8),
+complemento_end	varchar(255)	NOT NULL
+PRIMARY KEY (id_editora)
+)
+GO
+CREATE TABLE edicao (
+isbn		char(13)			NOT NULL UNIQUE CHECK(LEN(isbn) >=16),
+preco		decimal(4, 2)		NOT NULL CHECK(preco < 0),
+ano			int					NOT NULL CHECK(ano < 1993),
+num_paginas	int					NOT NULL CHECK(num_paginas < 15),
+qtd_estoque	int					NOT NULL
+PRIMARY KEY (isbn)
+)
+ 
+CREATE TABLE livro_autor (
+cod_livro	int					NOT NULL,
+id_autorid	int					NOT NULL,
+FOREIGN KEY (cod_livro) REFERENCES  livro (codigo),
+FOREIGN KEY (id_autorid) REFERENCES autor (id_autor)
+)
+ 
+CREATE TABLE editora_edicao_livro (
+editora_id	int					NOT NULL,
+edicao_isbn	char(13)			NOT NULL,
+cod_livroid	int					NOT NULL
+FOREIGN KEY (editora_id)  REFERENCES    editora (id_editora),
+FOREIGN KEY (edicao_isbn) REFERENCES	edicao  (isbn),
+FOREIGN KEY (cod_livroid) REFERENCES	livro	(codigo)
+)
